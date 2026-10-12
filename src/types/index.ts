@@ -1,5 +1,11 @@
 export type ImageStatus = "PROCESSING" | "ACCEPTED" | "REJECTED";
 
+export interface RejectionDetail {
+  code: string;
+  label: string;
+  description: string;
+}
+
 export interface UploadedImage {
   id: string;
   originalName: string;
@@ -11,6 +17,7 @@ export interface UploadedImage {
   height: number | null;
   status: ImageStatus;
   rejectionReasons: string[];
+  rejectionDetails?: RejectionDetail[];
   failureDetails?: {
     blurScore?: number;
     isBlurry?: boolean;
@@ -19,6 +26,7 @@ export interface UploadedImage {
     perceptualHash?: string;
     isDuplicate?: boolean;
     matchedImageId?: string;
+    rejectionDetails?: RejectionDetail[];
   } | null;
   blurScore: number | null;
   faceCount: number | null;

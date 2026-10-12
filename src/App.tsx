@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { AlertCircle, X, Loader2 } from "lucide-react";
+import { AlertCircle, X } from "lucide-react";
 import { Navbar } from "./components/Navbar.js";
 import { Dropzone } from "./components/Dropzone.js";
 import { AcceptedSection } from "./components/AcceptedSection.js";
 import { RejectedSection } from "./components/RejectedSection.js";
 import { RequirementsModal } from "./components/RequirementsModal.js";
+import { Loader } from "./components/common/Loader.js";
 import { useImageUploader } from "./hooks/useImageUploader.js";
 
 export function App() {
@@ -66,11 +67,11 @@ export function App() {
 
         {processingImages.length > 0 && (
           <div className="mb-6 p-3 bg-neutral-900 border border-neutral-800 rounded-md flex items-center gap-3">
-            <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+            <Loader size="sm" />
             <span className="text-xs text-neutral-300">
               Validating {processingImages.length} photo
               {processingImages.length > 1 ? "s" : ""} through computer vision
-              pipeline...
+              pipeline
             </span>
           </div>
         )}

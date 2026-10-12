@@ -1,14 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { ALLOWED_FORMATS, UI_CONFIG } from "../constants/index.js";
 import type { UploadedImage } from "../types/index.js";
-
-const VALID_MIME_TYPES = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/heic",
-  "image/heif",
-]);
-
-const VALID_EXTENSIONS = [".jpg", ".jpeg", ".png", ".heic", ".heif"];
 
 export function useImageUploader() {
   const [images, setImages] = useState<UploadedImage[]>([]);
@@ -52,7 +44,7 @@ export function useImageUploader() {
     if (hasProcessing) {
       pollingRef.current = setTimeout(() => {
         fetchImages();
-      }, 1200);
+      }, UI_CONFIG.POLL_INTERVAL_MS);
     }
 
     return () => {
@@ -70,11 +62,12 @@ export function useImageUploader() {
 
     for (const file of files) {
       const lowerName = file.name.toLowerCase();
-      const hasValidExt = VALID_EXTENSIONS.some((ext) =>
+      const hasValidExt = ALLOWED_FORMATS.EXTENSIONS.some((ext) =>
         lowerName.endsWith(ext),
       );
       const hasValidMime =
-        VALID_MIME_TYPES.has(file.type.toLowerCase()) || file.type === "";
+        ALLOWED_FORMATS.MIME_TYPES.has(file.type.toLowerCase()) ||
+        file.type === "";
 
       if (hasValidExt || hasValidMime) {
         valid.push(file);

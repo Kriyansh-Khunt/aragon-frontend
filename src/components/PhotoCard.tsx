@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Trash2, Crop, CheckCircle, Loader2 } from "lucide-react";
+import { Trash2, Crop, CheckCircle } from "lucide-react";
 import { GuidelineTooltip } from "./GuidelineTooltip.js";
 import { CropModal } from "./CropModal.js";
+import { Loader } from "./common/Loader.js";
 import type { UploadedImage } from "../types/index.js";
 
 interface PhotoCardProps {
@@ -16,9 +17,17 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
   onCropSave,
 }) => {
   const [isCropOpen, setIsCropOpen] = useState(false);
-  const primaryReason = image.rejectionReasons[0] || "Did not meet guidelines";
   const displaySrc = image.localPreviewUrl || image.storageUrl;
-  const isFar = primaryReason.toLowerCase().includes("far");
+
+  const firstDetail = image.failureDetails?.rejectionDetails?.[0];
+  const label =
+    firstDetail?.label ||
+    image.rejectionReasons[0] ||
+    "Did not meet guidelines";
+  const description =
+    firstDetail?.description ||
+    "This photo does not meet our headshot training guidelines. Please upload a clear portrait.";
+  const isFar = label.toLowerCase().includes("far");
 
   return (
     <>
@@ -31,9 +40,8 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="flex flex-col items-center justify-center text-neutral-500 text-xs">
-              <Loader2 className="w-6 h-6 animate-spin text-neutral-400 mb-2" />
-              <span>Loading...</span>
+            <div className="flex items-center justify-center">
+              <Loader size="md" />
             </div>
           )}
 
@@ -58,9 +66,8 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
           )}
 
           {image.status === "PROCESSING" && (
-            <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-1.5 text-white text-xs">
-              <Loader2 className="w-5 h-5 animate-spin text-emerald-400" />
-              <span>Analyzing...</span>
+            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+              <Loader size="lg" />
             </div>
           )}
         </div>
@@ -74,14 +81,10 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
           )}
 
           {image.status === "REJECTED" && (
-            <GuidelineTooltip reason={primaryReason}>
-              {primaryReason}
-            </GuidelineTooltip>
+            <GuidelineTooltip label={label} description={description} />
           )}
 
-          {image.status === "PROCESSING" && (
-            <span className="text-xs text-neutral-500">Checking...</span>
-          )}
+          {image.status === "PROCESSING" && <Loader size="sm" />}
         </div>
       </div>
 
