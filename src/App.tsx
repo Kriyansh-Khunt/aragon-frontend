@@ -8,6 +8,7 @@ import { RejectedSection } from "./components/RejectedSection.js";
 import { RequirementsModal } from "./components/RequirementsModal.js";
 import { Button } from "./components/common/Button.js";
 import { EmptyState } from "./components/common/EmptyState.js";
+import { Loader } from "./components/common/Loader.js";
 import { useImageUploader } from "./hooks/useImageUploader.js";
 
 export function App() {
@@ -19,6 +20,7 @@ export function App() {
     rejectedImages,
     processingImages,
     isUploading,
+    isInitialLoading,
     errorMessage,
     clearError,
     uploadFiles,
@@ -62,7 +64,7 @@ export function App() {
               </h2>
               <p className="text-xs text-neutral-500 mb-4 leading-relaxed">
                 Add portraits of yourself. Our AI checks resolution, blur, face
-                framing, and similarity in real-time.
+                framing and similarity in real-time.
               </p>
 
               <Dropzone onFilesSelected={uploadFiles} disabled={isUploading} />
@@ -91,34 +93,48 @@ export function App() {
           </aside>
 
           <section className="lg:col-span-8">
-            <AcceptedSection
-              images={acceptedImages}
-              onDelete={deleteImage}
-              onCropSave={cropImage}
-            />
+            {isInitialLoading ? (
+              <div className="bg-white border border-neutral-200 rounded-md p-12 flex flex-col items-center justify-center min-h-80">
+                <Loader className="w-5 h-5 text-neutral-500 mb-3" />
+                <p className="text-xs font-semibold text-neutral-800">
+                  Loading portraits
+                </p>
+                <p className="text-[11px] text-neutral-400 mt-1">
+                  Fetching computer vision records
+                </p>
+              </div>
+            ) : (
+              <>
+                <AcceptedSection
+                  images={acceptedImages}
+                  onDelete={deleteImage}
+                  onCropSave={cropImage}
+                />
 
-            <RejectedSection
-              images={rejectedImages}
-              acceptedCount={acceptedImages.length}
-              onDelete={deleteImage}
-              onCropSave={cropImage}
-            />
+                <RejectedSection
+                  images={rejectedImages}
+                  acceptedCount={acceptedImages.length}
+                  onDelete={deleteImage}
+                  onCropSave={cropImage}
+                />
 
-            {images.length === 0 && !isUploading && (
-              <EmptyState
-                icon={<UploadCloud className="w-5 h-5 text-neutral-500" />}
-                title="No photos uploaded yet"
-                description="Select photos on the left or load a sample test batch to evaluate the computer vision pipeline."
-                action={
-                  <Button
-                    variant="outline"
-                    onClick={seedDemo}
-                    isLoading={isUploading}
-                  >
-                    Load Test Batch
-                  </Button>
-                }
-              />
+                {images.length === 0 && !isUploading && (
+                  <EmptyState
+                    icon={<UploadCloud className="w-5 h-5 text-neutral-500" />}
+                    title="No photos uploaded yet"
+                    description="Select photos on the left or load a sample test batch to evaluate the computer vision pipeline."
+                    action={
+                      <Button
+                        variant="outline"
+                        onClick={seedDemo}
+                        isLoading={isUploading}
+                      >
+                        Load Test Batch
+                      </Button>
+                    }
+                  />
+                )}
+              </>
             )}
           </section>
         </div>

@@ -5,8 +5,10 @@ import type { UploadedImage } from "../types/index.js";
 export function useImageUploader() {
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const pollingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previewMapRef = useRef<Map<string, string>>(new Map());
 
   const fetchImages = useCallback(async () => {
     try {
@@ -17,20 +19,38 @@ export function useImageUploader() {
       const json = await res.json();
       if (Array.isArray(json.data)) {
         setImages((prev) => {
-          const previewMap = new Map<string, string>();
+          const inFlightMap = new Map<string, UploadedImage>();
           for (const img of prev) {
-            if (img.localPreviewUrl) {
-              previewMap.set(img.id, img.localPreviewUrl);
+            if (img.status === "PROCESSING") {
+              inFlightMap.set(img.id, img);
             }
           }
-          return json.data.map((item: UploadedImage) => ({
-            ...item,
-            localPreviewUrl: previewMap.get(item.id) || item.storageUrl,
-          }));
+          const serverIds = new Set(
+            json.data.map((item: UploadedImage) => item.id),
+          );
+
+          const mergedServer = json.data.map((item: UploadedImage) => {
+            const preview =
+              previewMapRef.current.get(item.id) ||
+              previewMapRef.current.get(item.originalName) ||
+              item.storageUrl;
+            return {
+              ...item,
+              localPreviewUrl: preview,
+            };
+          });
+
+          const remainingInFlight = Array.from(inFlightMap.values()).filter(
+            (item) => !serverIds.has(item.id),
+          );
+
+          return [...remainingInFlight, ...mergedServer];
         });
       }
     } catch (err) {
       console.error("Fetch images error:", err);
+    } finally {
+      setIsInitialLoading(false);
     }
   }, []);
 
@@ -90,7 +110,7 @@ export function useImageUploader() {
 
     if (invalidNames.length > 0) {
       setErrorMessage(
-        `Invalid format: ${invalidNames.join(", ")}. Only JPG, PNG, and HEIC files are allowed.`,
+        `Invalid format: ${invalidNames.join(", ")}. Only JPG, PNG and HEIC files are allowed.`,
       );
       if (valid.length === 0) {
         return;
@@ -105,12 +125,16 @@ export function useImageUploader() {
     for (const file of valid) {
       formData.append("images", file);
       const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+      const previewUrl = URL.createObjectURL(file);
+      previewMapRef.current.set(tempId, previewUrl);
+      previewMapRef.current.set(file.name, previewUrl);
+
       tempImages.push({
         id: tempId,
         originalName: file.name,
         fileName: file.name,
         storageUrl: "",
-        localPreviewUrl: URL.createObjectURL(file),
+        localPreviewUrl: previewUrl,
         mimeType: file.type || "image/jpeg",
         fileSizeBytes: file.size,
         width: null,
@@ -138,6 +162,27 @@ export function useImageUploader() {
         throw new Error(errorJson.error || "Upload failed");
       }
 
+      const uploadResult = await res.json();
+      if (Array.isArray(uploadResult.data)) {
+        const createdRecords: UploadedImage[] = uploadResult.data.map(
+          (rec: any) => {
+            const preview = previewMapRef.current.get(rec.originalName) || "";
+            if (preview) {
+              previewMapRef.current.set(rec.id, preview);
+            }
+            return {
+              ...rec,
+              localPreviewUrl: preview,
+            };
+          },
+        );
+
+        setImages((prev) => {
+          const nonTemp = prev.filter((img) => !img.id.startsWith("temp-"));
+          return [...createdRecords, ...nonTemp];
+        });
+      }
+
       await fetchImages();
     } catch (err: any) {
       setErrorMessage(err.message || "Failed to upload images");
@@ -162,6 +207,8 @@ export function useImageUploader() {
   const cropImage = async (id: string, croppedBlob: Blob) => {
     const formData = new FormData();
     formData.append("image", croppedBlob, "cropped-face.jpg");
+    const previewUrl = URL.createObjectURL(croppedBlob);
+    previewMapRef.current.set(id, previewUrl);
 
     setImages((prev) =>
       prev.map((img) => {
@@ -169,7 +216,7 @@ export function useImageUploader() {
           return {
             ...img,
             status: "PROCESSING",
-            localPreviewUrl: URL.createObjectURL(croppedBlob),
+            localPreviewUrl: previewUrl,
           };
         }
         return img;
@@ -221,6 +268,7 @@ export function useImageUploader() {
     rejectedImages,
     processingImages,
     isUploading,
+    isInitialLoading,
     errorMessage,
     clearError: () => setErrorMessage(null),
     uploadFiles,

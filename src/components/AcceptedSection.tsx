@@ -1,7 +1,6 @@
 import React from "react";
 import { CheckCircle2 } from "lucide-react";
 import { PhotoCard } from "./PhotoCard.js";
-import { EmptyState } from "./common/EmptyState.js";
 import type { UploadedImage } from "../types/index.js";
 
 interface AcceptedSectionProps {
@@ -16,14 +15,7 @@ export const AcceptedSection: React.FC<AcceptedSectionProps> = ({
   onCropSave,
 }) => {
   if (images.length === 0) {
-    return (
-      <EmptyState
-        icon={<CheckCircle2 className="w-5 h-5 text-emerald-600" />}
-        title="No approved portraits yet"
-        description="Select individual or batch portraits on the left. Passed images will appear here."
-        className="mb-6"
-      />
-    );
+    return null;
   }
 
   return (

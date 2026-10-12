@@ -119,7 +119,7 @@ export const Dropzone: React.FC<DropzoneProps> = ({
             )}
           </p>
           <p className="text-[11px] text-neutral-500">
-            Supports JPG, PNG, and HEIC (up to 25MB each)
+            Supports JPG, PNG and HEIC (up to 25MB each)
           </p>
         </div>
       </div>
