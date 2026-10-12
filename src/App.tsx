@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { AlertCircle, X } from "lucide-react";
+import { AlertCircle, X, Sparkles, UploadCloud } from "lucide-react";
 import { Navbar } from "./components/Navbar.js";
 import { Dropzone } from "./components/Dropzone.js";
+import { UploadQueue } from "./components/UploadQueue.js";
 import { AcceptedSection } from "./components/AcceptedSection.js";
 import { RejectedSection } from "./components/RejectedSection.js";
 import { RequirementsModal } from "./components/RequirementsModal.js";
-import { Loader } from "./components/common/Loader.js";
+import { Button } from "./components/common/Button.js";
+import { EmptyState } from "./components/common/EmptyState.js";
 import { useImageUploader } from "./hooks/useImageUploader.js";
 
 export function App() {
@@ -25,90 +27,102 @@ export function App() {
     seedDemo,
   } = useImageUploader();
 
+  const isReady = acceptedImages.length >= 6;
+
   return (
-    <div className="min-h-screen bg-[#09090b] text-neutral-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#fafafa] text-neutral-900 flex flex-col font-sans">
       <Navbar
-        acceptedCount={acceptedImages.length}
+        userName="Kriyansh Khunt"
         onOpenGuidelines={() => setIsGuidelinesOpen(true)}
         onSeedDemo={seedDemo}
         isSeeding={isUploading}
       />
 
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
         {errorMessage && (
-          <div className="mb-6 p-3.5 bg-red-950/40 border border-red-800/80 rounded-md text-red-200 text-xs flex items-center justify-between">
+          <div className="mb-6 p-3.5 bg-red-50 border border-red-200 rounded-md text-red-700 text-xs flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+              <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
               <span>{errorMessage}</span>
             </div>
             <button
               onClick={clearError}
-              className="p-1 text-red-400 hover:text-white rounded-md"
+              className="p-1 text-red-500 hover:text-red-800 rounded-md"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
         )}
 
-        <div className="text-center max-w-2xl mx-auto mb-8">
-          <h1 className="text-2xl font-bold text-white tracking-tight mb-2">
-            Upload Your Source Photos
-          </h1>
-          <p className="text-xs text-neutral-400 leading-relaxed">
-            Our ingestion AI evaluates each photo in real-time across
-            resolution, blur, framing, face count, and diversity to guarantee
-            studio-quality headshots.
-          </p>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <aside className="lg:col-span-4 space-y-4 lg:sticky lg:top-24">
+            <div className="bg-white border border-neutral-200 rounded-md p-5">
+              <h2 className="text-sm font-bold text-neutral-900 mb-1">
+                Upload Source Photos
+              </h2>
+              <p className="text-xs text-neutral-500 mb-4 leading-relaxed">
+                Add portraits of yourself. Our AI checks resolution, blur, face
+                framing, and similarity in real-time.
+              </p>
 
-        <div className="mb-8 max-w-2xl mx-auto">
-          <Dropzone onFilesSelected={uploadFiles} disabled={isUploading} />
-        </div>
+              <Dropzone onFilesSelected={uploadFiles} disabled={isUploading} />
+            </div>
 
-        {processingImages.length > 0 && (
-          <div className="mb-6 p-3 bg-neutral-900 border border-neutral-800 rounded-md flex items-center gap-3">
-            <Loader size="sm" />
-            <span className="text-xs text-neutral-300">
-              Validating {processingImages.length} photo
-              {processingImages.length > 1 ? "s" : ""} through computer vision
-              pipeline
-            </span>
-          </div>
-        )}
+            <UploadQueue items={processingImages} />
 
-        <AcceptedSection
-          images={acceptedImages}
-          onDelete={deleteImage}
-          onCropSave={cropImage}
-        />
+            <div className="bg-white border border-neutral-200 rounded-md p-4 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-semibold text-neutral-900">
+                  {acceptedImages.length} of 6 photos ready
+                </p>
+                <p className="text-[11px] text-neutral-500 mt-0.5">
+                  Minimum 6 good portraits required
+                </p>
+              </div>
 
-        <RejectedSection
-          images={rejectedImages}
-          acceptedCount={acceptedImages.length}
-          onDelete={deleteImage}
-          onCropSave={cropImage}
-        />
-
-        {images.length === 0 && !isUploading && (
-          <div className="text-center py-12 border border-neutral-800/50 rounded-md bg-neutral-900/20">
-            <p className="text-xs text-neutral-400">
-              No photos uploaded yet. Drop photos above or click{" "}
-              <button
-                onClick={seedDemo}
-                className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300"
+              <Button
+                variant="primary"
+                disabled={!isReady}
+                icon={<Sparkles className="w-3.5 h-3.5" />}
               >
-                Load Test Batch
-              </button>{" "}
-              to test the validation pipeline with sample cases.
-            </p>
-          </div>
-        )}
-      </main>
+                Train AI
+              </Button>
+            </div>
+          </aside>
 
-      <footer className="border-t border-neutral-800/60 py-4 text-center text-[11px] text-neutral-400">
-        Aragon.ai Technical Evaluation &bull; Computer Vision Pre-Ingestion
-        Architecture
-      </footer>
+          <section className="lg:col-span-8">
+            <AcceptedSection
+              images={acceptedImages}
+              onDelete={deleteImage}
+              onCropSave={cropImage}
+            />
+
+            <RejectedSection
+              images={rejectedImages}
+              acceptedCount={acceptedImages.length}
+              onDelete={deleteImage}
+              onCropSave={cropImage}
+            />
+
+            {images.length === 0 && !isUploading && (
+              <EmptyState
+                icon={<UploadCloud className="w-5 h-5 text-neutral-500" />}
+                title="No photos uploaded yet"
+                description="Select photos on the left or load a sample test batch to evaluate the computer vision pipeline."
+                action={
+                  <Button
+                    variant="outline"
+                    onClick={seedDemo}
+                    isLoading={isUploading}
+                  >
+                    Load Test Batch
+                  </Button>
+                }
+              />
+            )}
+          </section>
+        </div>
+      </main>
 
       <RequirementsModal
         isOpen={isGuidelinesOpen}

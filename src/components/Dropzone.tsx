@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { UploadCloud, Image as ImageIcon } from "lucide-react";
+import { ALLOWED_FORMATS } from "../constants/index.js";
 
 interface DropzoneProps {
   onFilesSelected: (files: FileList | File[]) => void;
@@ -54,39 +55,39 @@ export const Dropzone: React.FC<DropzoneProps> = ({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       onClick={() => inputRef.current?.click()}
-      className={`relative w-full border-2 border-dashed rounded-md p-8 flex flex-col items-center justify-center cursor-pointer transition-colors ${
+      className={`w-full border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center cursor-pointer transition-colors ${
         isDragOver
-          ? "border-emerald-500 bg-emerald-500/5"
-          : "border-neutral-800 hover:border-neutral-700 bg-neutral-900/40"
+          ? "border-emerald-600 bg-emerald-50/50"
+          : "border-neutral-300 hover:border-neutral-400 bg-white"
       }`}
     >
       <input
         ref={inputRef}
         type="file"
         multiple
-        accept=".jpg,.jpeg,.png,.heic,.heif,image/jpeg,image/png,image/heic"
+        accept={ALLOWED_FORMATS.ACCEPT_STRING}
         className="hidden"
         onChange={handleChange}
         disabled={disabled}
       />
 
-      <div className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-300 mb-3 border border-neutral-700">
+      <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 mb-3 border border-neutral-200">
         {isDragOver ? (
-          <UploadCloud className="w-6 h-6 text-emerald-400" />
+          <UploadCloud className="w-5 h-5 text-emerald-600" />
         ) : (
-          <ImageIcon className="w-6 h-6 text-neutral-400" />
+          <ImageIcon className="w-5 h-5 text-neutral-600" />
         )}
       </div>
 
       <div className="text-center">
-        <p className="text-sm font-medium text-white mb-1">
-          Drag & drop your photos here, or{" "}
-          <span className="text-emerald-400 underline underline-offset-2">
-            browse files
+        <p className="text-xs font-semibold text-neutral-800 mb-1">
+          Drag & drop photos or{" "}
+          <span className="text-emerald-700 underline underline-offset-2">
+            browse
           </span>
         </p>
-        <p className="text-xs text-neutral-400">
-          Supports JPEG, PNG, and Apple HEIC (min 512x512, up to 25MB each)
+        <p className="text-[11px] text-neutral-500">
+          Supports JPG, PNG, and HEIC (up to 25MB each)
         </p>
       </div>
     </div>

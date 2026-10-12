@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { PhotoCard } from "./PhotoCard.js";
 import type { UploadedImage } from "../types/index.js";
 
@@ -20,24 +20,22 @@ export const RejectedSection: React.FC<RejectedSectionProps> = ({
     return null;
   }
 
-  let subtext = "You need at least 6 good photos to train your headshot AI.";
+  let notice = `You currently have ${acceptedCount} approved photo. At least 6 are recommended for optimal model likeness.`;
   if (acceptedCount >= 6) {
-    subtext = `You can move to the next step as you've uploaded ${acceptedCount} good photos. Replacing these is optional.`;
+    notice = `You have reached the recommended ${acceptedCount} approved photos. Replacing flagged photos is optional.`;
   }
 
   return (
-    <div className="w-full bg-neutral-900/60 border border-neutral-800 rounded-md p-6 mb-6">
-      <div className="mb-4 pb-3 border-b border-neutral-800">
+    <div className="w-full bg-white border border-neutral-200 rounded-md p-6 mb-6">
+      <div className="mb-4 pb-3 border-b border-neutral-100">
         <div className="flex items-center gap-2 mb-1">
-          <div className="w-5 h-5 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center border border-red-500/20">
-            <AlertTriangle className="w-3.5 h-3.5" />
-          </div>
-          <h2 className="text-base font-semibold text-white">
-            Some Photos Didn't Meet Our Guidelines
+          <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+          <h2 className="text-sm font-semibold text-neutral-900">
+            Photos Requiring Attention ({images.length})
           </h2>
         </div>
-        <p className="text-xs text-neutral-400 ml-7 leading-relaxed">
-          {subtext}
+        <p className="text-xs text-neutral-500 ml-6 leading-relaxed">
+          {notice}
         </p>
       </div>
 

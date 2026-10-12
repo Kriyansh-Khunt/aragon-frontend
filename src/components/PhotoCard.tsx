@@ -31,8 +31,8 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
 
   return (
     <>
-      <div className="flex flex-col items-center group w-44">
-        <div className="relative w-44 h-52 bg-neutral-900 border border-neutral-800 rounded-md overflow-hidden flex items-center justify-center">
+      <div className="flex flex-col items-center group w-40">
+        <div className="relative w-40 h-48 bg-neutral-100 border border-neutral-200 rounded-md overflow-hidden flex items-center justify-center">
           {displaySrc ? (
             <img
               src={displaySrc}
@@ -47,10 +47,10 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
 
           <button
             onClick={() => onDelete(image.id)}
-            className="absolute top-2 right-2 w-7 h-7 bg-white/90 hover:bg-white text-neutral-800 rounded-full flex items-center justify-center transition-colors border border-neutral-300"
+            className="absolute top-2 right-2 w-7 h-7 bg-white/95 hover:bg-white text-neutral-700 hover:text-red-600 rounded-full flex items-center justify-center transition-colors border border-neutral-200"
             title="Delete photo"
           >
-            <Trash2 className="w-3.5 h-3.5 text-neutral-800" />
+            <Trash2 className="w-3.5 h-3.5" />
           </button>
 
           {image.status === "REJECTED" && isFar && (
@@ -66,15 +66,15 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
           )}
 
           {image.status === "PROCESSING" && (
-            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+            <div className="absolute inset-0 bg-white/60 backdrop-blur-xs flex items-center justify-center">
               <Loader size="lg" />
             </div>
           )}
         </div>
 
-        <div className="mt-2 text-center h-7 flex items-center justify-center">
+        <div className="mt-2 text-center min-h-6 flex items-center justify-center">
           {image.status === "ACCEPTED" && (
-            <div className="flex items-center gap-1 text-emerald-400 text-xs font-medium">
+            <div className="flex items-center gap-1 text-emerald-600 text-xs font-medium">
               <CheckCircle className="w-3.5 h-3.5" />
               <span>Approved</span>
             </div>

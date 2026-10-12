@@ -19,7 +19,7 @@ export const GuidelineTooltip: React.FC<GuidelineTooltipProps> = ({
       onMouseLeave={() => setIsOpen(false)}
       onClick={() => setIsOpen(!isOpen)}
     >
-      <span className="cursor-pointer border-b border-dotted border-neutral-400 text-xs text-neutral-300 hover:text-white transition-colors">
+      <span className="cursor-pointer border-b border-dotted border-neutral-400 text-xs text-neutral-700 hover:text-neutral-900 transition-colors">
         {label}
       </span>
 
@@ -27,7 +27,7 @@ export const GuidelineTooltip: React.FC<GuidelineTooltipProps> = ({
         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 p-3 bg-neutral-900 border border-neutral-800 rounded-md text-white z-50">
           <div className="flex items-center gap-1.5 mb-1.5 text-red-400 font-medium text-xs">
             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-            <span>Try again</span>
+            <span>Quality Notice</span>
           </div>
           <p className="text-xs text-neutral-300 leading-relaxed">
             {description}

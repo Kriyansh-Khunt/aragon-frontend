@@ -2,11 +2,11 @@
 
 @layer base {
   :root {
-    --bg-main: #09090b;
-    --bg-card: #141416;
-    --border-subtle: #27272a;
-    --text-primary: #f4f4f5;
-    --text-muted: #a1a1aa;
+    --bg-main: #fafafa;
+    --bg-card: #ffffff;
+    --border-subtle: #e4e4e7;
+    --text-primary: #09090b;
+    --text-muted: #71717a;
     --accent-emerald: #10b981;
     --accent-red: #ef4444;
   }
