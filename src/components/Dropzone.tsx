@@ -13,25 +13,42 @@ export const Dropzone: React.FC<DropzoneProps> = ({
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const dragCounterRef = useRef<number>(0);
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
-    if (!disabled) {
+    e.stopPropagation();
+    if (disabled) {
+      return;
+    }
+    dragCounterRef.current += 1;
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
       setIsDragOver(true);
     }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    if (!disabled && !isDragOver) {
+      setIsDragOver(true);
+    }
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragOver(false);
+    e.stopPropagation();
+    dragCounterRef.current -= 1;
+    if (dragCounterRef.current <= 0) {
+      dragCounterRef.current = 0;
+      setIsDragOver(false);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    dragCounterRef.current = 0;
     setIsDragOver(false);
     if (disabled) {
       return;
@@ -57,7 +74,7 @@ export const Dropzone: React.FC<DropzoneProps> = ({
       onClick={() => inputRef.current?.click()}
       className={`w-full border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center cursor-pointer transition-colors ${
         isDragOver
-          ? "border-emerald-600 bg-emerald-50/50"
+          ? "border-emerald-600 bg-emerald-50/70 scale-[1.01]"
           : "border-neutral-300 hover:border-neutral-400 bg-white"
       }`}
     >
@@ -71,24 +88,40 @@ export const Dropzone: React.FC<DropzoneProps> = ({
         disabled={disabled}
       />
 
-      <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 mb-3 border border-neutral-200">
-        {isDragOver ? (
-          <UploadCloud className="w-5 h-5 text-emerald-600" />
-        ) : (
-          <ImageIcon className="w-5 h-5 text-neutral-600" />
-        )}
-      </div>
+      <div className="flex flex-col items-center justify-center pointer-events-none select-none">
+        <div
+          className={`w-10 h-10 rounded-full flex items-center justify-center mb-3 border transition-colors ${
+            isDragOver
+              ? "bg-emerald-100 text-emerald-700 border-emerald-300"
+              : "bg-neutral-100 text-neutral-600 border-neutral-200"
+          }`}
+        >
+          {isDragOver ? (
+            <UploadCloud className="w-5 h-5 text-emerald-600" />
+          ) : (
+            <ImageIcon className="w-5 h-5 text-neutral-600" />
+          )}
+        </div>
 
-      <div className="text-center">
-        <p className="text-xs font-semibold text-neutral-800 mb-1">
-          Drag & drop photos or{" "}
-          <span className="text-emerald-700 underline underline-offset-2">
-            browse
-          </span>
-        </p>
-        <p className="text-[11px] text-neutral-500">
-          Supports JPG, PNG, and HEIC (up to 25MB each)
-        </p>
+        <div className="text-center">
+          <p className="text-xs font-semibold text-neutral-800 mb-1">
+            {isDragOver ? (
+              <span className="text-emerald-700 font-bold">
+                Drop photos to upload
+              </span>
+            ) : (
+              <>
+                Drag & drop photos or{" "}
+                <span className="text-emerald-700 underline underline-offset-2">
+                  browse
+                </span>
+              </>
+            )}
+          </p>
+          <p className="text-[11px] text-neutral-500">
+            Supports JPG, PNG, and HEIC (up to 25MB each)
+          </p>
+        </div>
       </div>
     </div>
   );

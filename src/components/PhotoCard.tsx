@@ -28,16 +28,21 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
     firstDetail?.description ||
     "This photo does not meet our headshot training guidelines. Please upload a clear portrait.";
   const isFar = label.toLowerCase().includes("far");
+  const isProcessing = image.status === "PROCESSING";
 
   return (
     <>
-      <div className="flex flex-col items-center group w-40">
-        <div className="relative w-40 h-48 bg-neutral-100 border border-neutral-200 rounded-md overflow-hidden flex items-center justify-center">
+      <div className="flex flex-col items-center w-full max-w-47.5 mx-auto group">
+        <div className="relative w-full aspect-4/5 bg-neutral-100 border border-neutral-200 rounded-md overflow-hidden flex items-center justify-center">
           {displaySrc ? (
             <img
               src={displaySrc}
               alt={image.originalName}
-              className="w-full h-full object-cover"
+              className={`w-full h-full object-cover transition-all duration-300 ${
+                isProcessing
+                  ? "blur-[2px] brightness-90 scale-102"
+                  : "blur-none brightness-100 scale-100"
+              }`}
             />
           ) : (
             <div className="flex items-center justify-center">
@@ -45,16 +50,18 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
             </div>
           )}
 
-          <button
-            onClick={() => onDelete(image.id)}
-            className="absolute top-2 right-2 w-7 h-7 bg-white/95 hover:bg-white text-neutral-700 hover:text-red-600 rounded-full flex items-center justify-center transition-colors border border-neutral-200"
-            title="Delete photo"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
+          {!isProcessing && (
+            <button
+              onClick={() => onDelete(image.id)}
+              className="absolute top-2 right-2 w-7 h-7 bg-white/95 hover:bg-white text-neutral-700 hover:text-red-600 rounded-full flex items-center justify-center transition-colors border border-neutral-200 z-10"
+              title="Delete photo"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          )}
 
           {image.status === "REJECTED" && isFar && (
-            <div className="absolute bottom-2 left-2 right-2 flex justify-center">
+            <div className="absolute bottom-2 left-2 right-2 flex justify-center z-10">
               <button
                 onClick={() => setIsCropOpen(true)}
                 className="flex items-center gap-1.5 px-2.5 py-1 bg-white/95 hover:bg-white text-neutral-900 text-xs font-medium rounded-md border border-neutral-300 transition-colors"
@@ -65,17 +72,23 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
             </div>
           )}
 
-          {image.status === "PROCESSING" && (
-            <div className="absolute inset-0 bg-white/60 backdrop-blur-xs flex items-center justify-center">
-              <Loader size="lg" />
+          {isProcessing && (
+            <div className="absolute inset-0 bg-neutral-900/20 backdrop-blur-[1px] flex flex-col items-center justify-center pointer-events-none">
+              <div className="absolute left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-emerald-400 to-transparent animate-ai-scan pointer-events-none" />
+              <div className="px-2.5 py-1 bg-white/90 rounded-md border border-neutral-200 flex items-center gap-1.5 z-10">
+                <Loader size="sm" />
+                <span className="text-[10px] font-medium text-neutral-800">
+                  Scanning
+                </span>
+              </div>
             </div>
           )}
         </div>
 
-        <div className="mt-2 text-center min-h-6 flex items-center justify-center">
+        <div className="mt-2 text-center min-h-6 flex items-center justify-center w-full px-1">
           {image.status === "ACCEPTED" && (
             <div className="flex items-center gap-1 text-emerald-600 text-xs font-medium">
-              <CheckCircle className="w-3.5 h-3.5" />
+              <CheckCircle className="w-3.5 h-3.5 shrink-0" />
               <span>Approved</span>
             </div>
           )}
@@ -84,7 +97,7 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
             <GuidelineTooltip label={label} description={description} />
           )}
 
-          {image.status === "PROCESSING" && <Loader size="sm" />}
+          {isProcessing && <Loader size="sm" />}
         </div>
       </div>
 

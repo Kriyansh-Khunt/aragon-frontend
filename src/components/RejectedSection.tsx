@@ -26,7 +26,7 @@ export const RejectedSection: React.FC<RejectedSectionProps> = ({
   }
 
   return (
-    <div className="w-full bg-white border border-neutral-200 rounded-md p-6 mb-6">
+    <div className="w-full bg-white border border-neutral-200 rounded-md p-4 sm:p-6 mb-6">
       <div className="mb-4 pb-3 border-b border-neutral-100">
         <div className="flex items-center gap-2 mb-1">
           <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
@@ -39,7 +39,7 @@ export const RejectedSection: React.FC<RejectedSectionProps> = ({
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
         {images.map((img) => (
           <PhotoCard
             key={img.id}

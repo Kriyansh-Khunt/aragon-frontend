@@ -27,7 +27,7 @@ export const AcceptedSection: React.FC<AcceptedSectionProps> = ({
   }
 
   return (
-    <div className="w-full bg-white border border-neutral-200 rounded-md p-6 mb-6">
+    <div className="w-full bg-white border border-neutral-200 rounded-md p-4 sm:p-6 mb-6">
       <div className="flex items-center justify-between mb-4 pb-3 border-b border-neutral-100">
         <div className="flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -35,12 +35,12 @@ export const AcceptedSection: React.FC<AcceptedSectionProps> = ({
             Approved Photos ({images.length})
           </h2>
         </div>
-        <span className="text-xs text-neutral-500">
+        <span className="text-xs text-neutral-500 hidden sm:inline">
           Verified for model generation
         </span>
       </div>
 
-      <div className="flex flex-wrap gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
         {images.map((img) => (
           <PhotoCard
             key={img.id}

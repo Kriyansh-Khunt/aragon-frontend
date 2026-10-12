@@ -38,7 +38,7 @@ export function App() {
         isSeeding={isUploading}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {errorMessage && (
           <div className="mb-6 p-3.5 bg-red-50 border border-red-200 rounded-md text-red-700 text-xs flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -54,9 +54,9 @@ export function App() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
           <aside className="lg:col-span-4 space-y-4 lg:sticky lg:top-24">
-            <div className="bg-white border border-neutral-200 rounded-md p-5">
+            <div className="bg-white border border-neutral-200 rounded-md p-4 sm:p-5">
               <h2 className="text-sm font-bold text-neutral-900 mb-1">
                 Upload Source Photos
               </h2>
