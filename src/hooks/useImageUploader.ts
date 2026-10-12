@@ -19,16 +19,7 @@ export function useImageUploader() {
       const json = await res.json();
       if (Array.isArray(json.data)) {
         setImages((prev) => {
-          const inFlightMap = new Map<string, UploadedImage>();
-          for (const img of prev) {
-            if (img.status === "PROCESSING") {
-              inFlightMap.set(img.id, img);
-            }
-          }
-          const serverIds = new Set(
-            json.data.map((item: UploadedImage) => item.id),
-          );
-
+          const tempItems = prev.filter((img) => img.id.startsWith("temp-"));
           const mergedServer = json.data.map((item: UploadedImage) => {
             const preview =
               previewMapRef.current.get(item.id) ||
@@ -40,11 +31,7 @@ export function useImageUploader() {
             };
           });
 
-          const remainingInFlight = Array.from(inFlightMap.values()).filter(
-            (item) => !serverIds.has(item.id),
-          );
-
-          return [...remainingInFlight, ...mergedServer];
+          return [...tempItems, ...mergedServer];
         });
       }
     } catch (err) {

@@ -53,7 +53,7 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
           {!isProcessing && (
             <button
               onClick={() => onDelete(image.id)}
-              className="absolute top-2 right-2 w-7 h-7 bg-white/95 hover:bg-white text-neutral-700 hover:text-red-600 rounded-full flex items-center justify-center transition-colors border border-neutral-200 z-10"
+              className="absolute cursor-pointer top-2 right-2 w-7 h-7 bg-white/95 hover:bg-white text-neutral-700 hover:text-red-600 rounded-full flex items-center justify-center transition-colors border border-neutral-200 z-10"
               title="Delete photo"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -85,20 +85,20 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
           )}
         </div>
 
-        <div className="mt-2 text-center min-h-6 flex items-center justify-center w-full px-1">
-          {image.status === "ACCEPTED" && (
-            <div className="flex items-center gap-1 text-emerald-600 text-xs font-medium">
-              <CheckCircle className="w-3.5 h-3.5 shrink-0" />
-              <span>Approved</span>
-            </div>
-          )}
+        {!isProcessing && (
+          <div className="mt-2 text-center min-h-6 flex items-center justify-center w-full px-1">
+            {image.status === "ACCEPTED" && (
+              <div className="flex items-center gap-1 text-emerald-600 text-xs font-medium">
+                <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>Approved</span>
+              </div>
+            )}
 
-          {image.status === "REJECTED" && (
-            <GuidelineTooltip label={label} description={description} />
-          )}
-
-          {isProcessing && <Loader size="sm" />}
-        </div>
+            {image.status === "REJECTED" && (
+              <GuidelineTooltip label={label} description={description} />
+            )}
+          </div>
+        )}
       </div>
 
       <CropModal

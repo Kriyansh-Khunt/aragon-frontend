@@ -22,32 +22,48 @@ export const UploadQueue: React.FC<UploadQueueProps> = ({ items }) => {
   return (
     <div className="w-full bg-white border border-neutral-200 rounded-md p-4">
       <div className="flex items-center justify-between mb-3 pb-2 border-b border-neutral-100">
-        <h3 className="text-xs font-semibold text-neutral-800">
-          Validating Queue ({items.length})
-        </h3>
-        <Loader size="sm" />
+        <div className="flex items-center gap-2">
+          <Loader size="sm" />
+          <h3 className="text-xs font-semibold text-neutral-900">
+            Ingestion Queue ({items.length})
+          </h3>
+        </div>
+        <span className="text-[11px] text-neutral-400">Processing</span>
       </div>
 
-      <div className="space-y-2 max-h-60 overflow-y-auto">
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className="flex items-center justify-between p-2.5 bg-neutral-50 rounded-md border border-neutral-200 text-xs"
-          >
-            <div className="flex items-center gap-2.5 overflow-hidden pr-2">
-              <FileImage className="w-4 h-4 text-neutral-500 shrink-0" />
-              <div className="truncate">
-                <p className="font-medium text-neutral-900 truncate">
-                  {item.originalName}
-                </p>
-                <p className="text-[10px] text-neutral-500">
-                  {formatSize(item.fileSizeBytes)}
-                </p>
+      <div className="divide-y divide-neutral-100 max-h-56 overflow-y-auto scrollbar-thin">
+        {items.map((item) => {
+          const previewSrc = item.localPreviewUrl || item.storageUrl;
+          return (
+            <div
+              key={item.id}
+              className="flex items-center justify-between py-2 px-1 text-xs"
+            >
+              <div className="flex items-center gap-2.5 overflow-hidden pr-2">
+                {previewSrc ? (
+                  <img
+                    src={previewSrc}
+                    alt={item.originalName}
+                    className="w-7 h-7 rounded-md object-cover bg-neutral-100 shrink-0 border border-neutral-200"
+                  />
+                ) : (
+                  <div className="w-7 h-7 rounded-md bg-neutral-100 border border-neutral-200 flex items-center justify-center shrink-0">
+                    <FileImage className="w-3.5 h-3.5 text-neutral-400" />
+                  </div>
+                )}
+                <div className="truncate">
+                  <p className="font-medium text-neutral-900 truncate">
+                    {item.originalName}
+                  </p>
+                  <p className="text-[10px] text-neutral-400">
+                    {formatSize(item.fileSizeBytes)}
+                  </p>
+                </div>
               </div>
+              <Loader size="sm" className="shrink-0 text-neutral-400" />
             </div>
-            <Loader size="sm" className="shrink-0" />
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

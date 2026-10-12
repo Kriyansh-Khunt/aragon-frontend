@@ -3,6 +3,7 @@ import { AlertCircle, X, Sparkles, UploadCloud } from "lucide-react";
 import { Navbar } from "./components/Navbar.js";
 import { Dropzone } from "./components/Dropzone.js";
 import { UploadQueue } from "./components/UploadQueue.js";
+import { ProcessingSection } from "./components/ProcessingSection.js";
 import { AcceptedSection } from "./components/AcceptedSection.js";
 import { RejectedSection } from "./components/RejectedSection.js";
 import { RequirementsModal } from "./components/RequirementsModal.js";
@@ -94,7 +95,7 @@ export function App() {
 
           <section className="lg:col-span-8">
             {isInitialLoading ? (
-              <div className="bg-white border border-neutral-200 rounded-md p-12 flex flex-col items-center justify-center min-h-80">
+              <div className="bg-white border border-neutral-200 rounded-md p-12 flex flex-col items-center justify-center min-h-60">
                 <Loader className="w-5 h-5 text-neutral-500 mb-3" />
                 <p className="text-xs font-semibold text-neutral-800">
                   Loading portraits
@@ -105,6 +106,12 @@ export function App() {
               </div>
             ) : (
               <>
+                <ProcessingSection
+                  images={processingImages}
+                  onDelete={deleteImage}
+                  onCropSave={cropImage}
+                />
+
                 <AcceptedSection
                   images={acceptedImages}
                   onDelete={deleteImage}
