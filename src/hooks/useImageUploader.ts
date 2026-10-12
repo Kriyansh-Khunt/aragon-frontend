@@ -10,17 +10,21 @@ export function useImageUploader() {
   const pollingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previewMapRef = useRef<Map<string, string>>(new Map());
 
-  const fetchImages = useCallback(async () => {
+  const fetchImages = useCallback(async (retryCount = 0) => {
     try {
       const res = await fetch("/api/images");
       if (!res.ok) {
+        if (retryCount < 2) {
+          setTimeout(() => fetchImages(retryCount + 1), 1500);
+          return;
+        }
+        setIsInitialLoading(false);
         return;
       }
       const json = await res.json();
       if (Array.isArray(json.data)) {
-        setImages((prev) => {
-          const tempItems = prev.filter((img) => img.id.startsWith("temp-"));
-          const mergedServer = json.data.map((item: UploadedImage) => {
+        setImages(
+          json.data.map((item: UploadedImage) => {
             const preview =
               previewMapRef.current.get(item.id) ||
               previewMapRef.current.get(item.originalName) ||
@@ -29,14 +33,16 @@ export function useImageUploader() {
               ...item,
               localPreviewUrl: preview,
             };
-          });
-
-          return [...tempItems, ...mergedServer];
-        });
+          }),
+        );
       }
+      setIsInitialLoading(false);
     } catch (err) {
       console.error("Fetch images error:", err);
-    } finally {
+      if (retryCount < 2) {
+        setTimeout(() => fetchImages(retryCount + 1), 1500);
+        return;
+      }
       setIsInitialLoading(false);
     }
   }, []);
@@ -107,36 +113,11 @@ export function useImageUploader() {
     setIsUploading(true);
 
     const formData = new FormData();
-    const tempImages: UploadedImage[] = [];
-
     for (const file of valid) {
       formData.append("images", file);
-      const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
       const previewUrl = URL.createObjectURL(file);
-      previewMapRef.current.set(tempId, previewUrl);
       previewMapRef.current.set(file.name, previewUrl);
-
-      tempImages.push({
-        id: tempId,
-        originalName: file.name,
-        fileName: file.name,
-        storageUrl: "",
-        localPreviewUrl: previewUrl,
-        mimeType: file.type || "image/jpeg",
-        fileSizeBytes: file.size,
-        width: null,
-        height: null,
-        status: "PROCESSING",
-        rejectionReasons: [],
-        failureDetails: null,
-        blurScore: null,
-        faceCount: null,
-        faceAreaRatio: null,
-        createdAt: new Date().toISOString(),
-      });
     }
-
-    setImages((prev) => [...tempImages, ...prev]);
 
     try {
       const res = await fetch("/api/images/upload", {
@@ -151,23 +132,12 @@ export function useImageUploader() {
 
       const uploadResult = await res.json();
       if (Array.isArray(uploadResult.data)) {
-        const createdRecords: UploadedImage[] = uploadResult.data.map(
-          (rec: any) => {
-            const preview = previewMapRef.current.get(rec.originalName) || "";
-            if (preview) {
-              previewMapRef.current.set(rec.id, preview);
-            }
-            return {
-              ...rec,
-              localPreviewUrl: preview,
-            };
-          },
-        );
-
-        setImages((prev) => {
-          const nonTemp = prev.filter((img) => !img.id.startsWith("temp-"));
-          return [...createdRecords, ...nonTemp];
-        });
+        for (const rec of uploadResult.data) {
+          const preview = previewMapRef.current.get(rec.originalName);
+          if (preview) {
+            previewMapRef.current.set(rec.id, preview);
+          }
+        }
       }
 
       await fetchImages();
